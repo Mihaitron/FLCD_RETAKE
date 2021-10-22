@@ -1,0 +1,26 @@
+#start
+    #integer nr;
+    #integer i;
+    #bool is_prime = true;
+    #read nr;
+
+    #if (nr <= 1) #then
+        is_prime = false;
+    #else #if (nr == 2) #then
+        is_prime = true;
+    #else #if (nr % 2 == 0) #then
+        is_prime = false;
+    #else #then
+        #for (i = 3, #sqrt(n), 2) #do
+            #if (nr % i == 0) #then
+                is_prime = false;
+            #end
+        #end
+    #end #end #end
+
+    #if (is_prime == true) #then
+        #print “It is prime”;
+    #else #then
+        #print “It is NOT prime”;
+    #end
+#stop
