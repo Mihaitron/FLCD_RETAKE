@@ -5,6 +5,6 @@ public class Main
     public static void main(String[] args) throws IOException
     {
         Scanner scanner = new Scanner();
-        scanner.scan("p1.orange");
+        scanner.scan("p3.orange");
     }
 }

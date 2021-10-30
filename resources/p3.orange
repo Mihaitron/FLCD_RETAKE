@@ -1,0 +1,11 @@
+#start
+    #integer[5] array = (4, 3, 2, 1, 5);
+    #integer sum = 0;
+    #integer i;
+
+    #for (i = 0, 5, 1) #then
+        sum = sum + array[i];
+    #end
+
+    #print sum;
+#stop

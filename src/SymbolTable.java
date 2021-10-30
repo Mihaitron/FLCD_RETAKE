@@ -86,4 +86,14 @@ public class SymbolTable
     {
         return length == 0;
     }
+
+    public String toString()
+    {
+        String st = "";
+        for (Integer i = 0; i < capacity; i++)
+            if (table.get(i) != null)
+                st += table.get(i) + " -> " + i + "\n";
+
+        return st;
+    }
 }

@@ -1,3 +1,5 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +25,8 @@ public class Scanner
         separators.add('(');
         separators.add(')');
         separators.add(',');
+        separators.add('[');
+        separators.add(']');
     }
 
     private Entry<String, Integer> detect(String program, Integer index)
@@ -42,7 +46,12 @@ public class Scanner
             {
                 token += character;
                 index++;
+
+                if (index >= program.length())
+                    break;
+
                 character = program.charAt(index);
+
             }
             while (character != '"');
             token += character;
@@ -60,7 +69,7 @@ public class Scanner
         }
 
         if (token.equals(""))
-            return new SimpleEntry<>(token, index);
+            return new SimpleEntry<>("" + character, index);
         else
             return new SimpleEntry<>(token, index - 1);
     }
@@ -77,7 +86,7 @@ public class Scanner
     public void scan(String filename) throws IOException
     {
         String program = Files.readString(Path.of("resources/" + filename)).replace("\r", "");
-        int lineNr = 1;
+        int line_nr = 1;
 
         for (int i = 0; i < program.length(); i++)
         {
@@ -85,8 +94,12 @@ public class Scanner
             String token = token_index.getKey();
             i = token_index.getValue();
 
-            if (token.equals(""))
+            if (token.trim().isEmpty())
+            {
+                if (token.equals("\n"))
+                    line_nr++;
                 continue;
+            }
 
             if (tokens.contains(token))
                 pif.add(new SimpleEntry<>(token, 0));
@@ -98,16 +111,37 @@ public class Scanner
             }
             else
             {
-                System.out.println("Lexical error at line: " + lineNr);
-                break;
-            }
-
-            if (program.charAt(i) == '\n')
-            {
-                lineNr++;
+                System.out.println("Lexical error at line: " + line_nr);
+                return;
             }
         }
 
         System.out.println("Program is lexically correct.");
+        writePIF();
+        writeST();
+    }
+
+    private void writePIF() throws IOException
+    {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("out_files/PIF.out"));
+
+        String pif_string = "";
+        for (Entry entry : pif)
+            pif_string += entry.getKey() + " -> " + entry.getValue() + "\n";
+
+        writer.append("===== PIF =====\n");
+        writer.append(pif_string);
+
+        writer.close();
+    }
+
+    private void writeST() throws IOException
+    {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("out_files/ST.out"));
+
+        writer.append("===== ST =====\n");
+        writer.append(st.toString());
+
+        writer.close();
     }
 }
