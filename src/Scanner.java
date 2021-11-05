@@ -16,6 +16,7 @@ public class Scanner
     private Set<Character> separators = new HashSet<>();
     private FA integerFA = new FA();
     private FA stringFA = new FA();
+    private FA identifierFA = new FA();
 
     public Scanner() throws IOException
     {
@@ -23,6 +24,7 @@ public class Scanner
         String[] tokens_split = tokens_string.split("\r\n");
         integerFA.readFA("integer_fa.in");
         stringFA.readFA("string_fa.in");
+        identifierFA.readFA("identifier_fa.in");
 
         tokens.addAll(Arrays.asList(tokens_split));
         separators.add(';');
@@ -89,7 +91,7 @@ public class Scanner
                 token.equals("false") ||
                 integerFA.verifySequenceAccepted(token) ||
                 stringFA.verifySequenceAccepted(token) ||
-                Pattern.matches("[A-Za-z][A-Za-z1-90_]*", token);
+                identifierFA.verifySequenceAccepted(token);
     }
 
     public void scan(String filename) throws IOException
