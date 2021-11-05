@@ -14,11 +14,15 @@ public class Scanner
     private SymbolTable st = new SymbolTable();
     private Set<String> tokens = new HashSet<>();
     private Set<Character> separators = new HashSet<>();
+    private FA integerFA = new FA();
+    private FA stringFA = new FA();
 
     public Scanner() throws IOException
     {
         String tokens_string = Files.readString(Path.of("resources/tokens.in"));
         String[] tokens_split = tokens_string.split("\r\n");
+        integerFA.readFA("integer_fa.in");
+        stringFA.readFA("string_fa.in");
 
         tokens.addAll(Arrays.asList(tokens_split));
         separators.add(';');
@@ -76,11 +80,16 @@ public class Scanner
 
     private Boolean isIdentifierOrConstant(String token)
     {
+//        return token.equals("true") ||
+//                token.equals("false") ||
+//                Pattern.matches("[-+]?(0|[1-9][1-90]*)", token) ||
+//                Pattern.matches("[A-Za-z][A-Za-z1-90_]*", token) ||
+//                Pattern.matches("\"[^\"]*\"", token);
         return token.equals("true") ||
                 token.equals("false") ||
-                Pattern.matches("[-+]?(0|[1-9][1-90]*)", token) ||
-                Pattern.matches("[A-Za-z][A-Za-z1-90_]*", token) ||
-                Pattern.matches("\"[^\"]*\"", token);
+                integerFA.verifySequenceAccepted(token) ||
+                stringFA.verifySequenceAccepted(token) ||
+                Pattern.matches("[A-Za-z][A-Za-z1-90_]*", token);
     }
 
     public void scan(String filename) throws IOException
