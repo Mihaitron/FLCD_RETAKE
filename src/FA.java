@@ -55,7 +55,7 @@ public class FA
     private List<String> alphabet = new ArrayList<>();
     private String starting = "";
     private List<String> finalStates = new ArrayList<>();
-    private List<Triple<String, String, String>> rules = new ArrayList<>();
+    private List<Triple<String, String, String>> transitions = new ArrayList<>();
 
     public void readFA(String file)
     {
@@ -81,7 +81,7 @@ public class FA
                 String[] rule = rules_line.split("->");
                 String[] lhs = rule[0].split(" ");
 
-                rules.add(new Triple<>(lhs[0], lhs[1], rule[1].replace(" ", "")));
+                transitions.add(new Triple<>(lhs[0], lhs[1], rule[1].replace(" ", "")));
 
                 rules_line = reader.readLine();
             }
@@ -120,27 +120,27 @@ public class FA
 
         if (index.equals("5"))
         {
-            for (Triple<String, String, String> rule : rules)
+            for (Triple<String, String, String> rule : transitions)
                 System.out.println(rule.getA() + " " + rule.getB() + " -> " + rule.getC());
             System.out.println();
         }
 
         if (index.equals("6"))
-            System.out.println("Is DFA? " + isDFA());
+            System.out.println(isDFA());
     }
 
     private Boolean isDFA()
     {
-        for (int i = 0; i < rules.size() - 1; i++)
-            for (int j = i + 1; j < rules.size(); j++)
-                if (rules.get(i).getA().equals(rules.get(j).getA()) && rules.get(i).getB().equals(rules.get(j).getB()))
+        for (int i = 0; i < transitions.size() - 1; i++)
+            for (int j = i + 1; j < transitions.size(); j++)
+                if (transitions.get(i).getA().equals(transitions.get(j).getA()) && transitions.get(i).getB().equals(transitions.get(j).getB()))
                     return false;
         return true;
     }
 
     private Triple<String, String, String> getRule(String state, String transition_alphabet)
     {
-        for (Triple<String, String, String> rule : rules)
+        for (Triple<String, String, String> rule : transitions)
         {
             if (rule.getA().equals(state) && rule.getB().equals(transition_alphabet))
                 return rule;
