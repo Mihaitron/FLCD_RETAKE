@@ -1,5 +1,5 @@
 #start
-    #string text = this declaration is incorrect";
+    #string text = "this declaration is incorrect";
     #nteger i
     #for (i = 0, 10, 2) #o
         #print text;

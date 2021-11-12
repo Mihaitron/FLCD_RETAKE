@@ -3,7 +3,7 @@ import java.util.List;
 
 public class SymbolTable
 {
-    private Integer capacity = 8;
+    private Integer capacity = 50;
     private Integer length = 0;
     private Float c1 = 0.5F;
     private Float c2 = 0.5F;
