@@ -87,10 +87,17 @@ public class Scanner
 //                Pattern.matches("[-+]?(0|[1-9][1-90]*)", token) ||
 //                Pattern.matches("[A-Za-z][A-Za-z1-90_]*", token) ||
 //                Pattern.matches("\"[^\"]*\"", token);
+
+//        return token.equals("true") ||
+//                token.equals("false") ||
+//                integerFA.verifySequenceAccepted(token) ||
+//                stringFA.verifySequenceAccepted(token) ||
+//                identifierFA.verifySequenceAccepted(token);
+
         return token.equals("true") ||
                 token.equals("false") ||
                 integerFA.verifySequenceAccepted(token) ||
-                stringFA.verifySequenceAccepted(token) ||
+                Pattern.matches("\"[^\"]*\"", token) ||
                 identifierFA.verifySequenceAccepted(token);
     }
 
