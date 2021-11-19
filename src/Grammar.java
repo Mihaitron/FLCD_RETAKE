@@ -9,6 +9,7 @@ public class Grammar
 {
     private Set<String> nonterminals = new HashSet<>();
     private Set<String> terminals = new HashSet<>();
+    private String starting;
     private Map<String, List<String>> rules = new HashMap<>();
 
     public void readGrammar(String file)
@@ -23,6 +24,8 @@ public class Grammar
 
             String alphabet_line = reader.readLine();
             terminals.addAll(Arrays.asList(alphabet_line.split(" ")));
+
+            starting = reader.readLine();
 
             String rules_line = reader.readLine();
             while (rules_line != null)
