@@ -76,10 +76,22 @@ public class Grammar
         }
     }
 
-    public void isCFG()
+    public boolean isCFG()
     {
-        Boolean is_cfg = true;
-
+        for (Entry<String, List<List<String>>> entry : rules.entrySet())
+        {
+            if (!nonterminals.contains(entry.getKey()))
+                return false;
+            for (List<String> prod : entry.getValue())
+            {
+                for (String value : prod)
+                {
+                    if (!nonterminals.contains(value) && !terminals.contains(value))
+                        return false;
+                }
+            }
+        }
+        return true;
 
     }
 }
