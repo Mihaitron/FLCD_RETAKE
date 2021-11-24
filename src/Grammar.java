@@ -10,7 +10,7 @@ public class Grammar
     private Set<String> nonterminals = new HashSet<>();
     private Set<String> terminals = new HashSet<>();
     private String starting;
-    private Map<String, List<String>> rules = new HashMap<>();
+    private Map<String, List<List<String>>> rules = new HashMap<>();
 
     public void readGrammar(String file)
     {
@@ -33,8 +33,12 @@ public class Grammar
                 String[] rule = rules_line.split("->");
                 String nonterminal = rule[0].trim();
                 List<String> productions = Arrays.stream(rule[1].split("\\|")).map(String::trim).collect(Collectors.toList());
+                List<List<String>> productions_split = new ArrayList<>();
 
-                rules.put(nonterminal, productions);
+                for (String production : productions)
+                    productions_split.add(Arrays.asList(production.split(" ")));
+
+                rules.put(nonterminal, productions_split);
 
                 rules_line = reader.readLine();
             }
@@ -56,12 +60,17 @@ public class Grammar
     }
 
     public void printProductions() {
-        for (Entry<String, List<String>> production : rules.entrySet())
+        for (Entry<String, List<List<String>>> production : rules.entrySet())
         {
             String productions_str = "";
             for (int i = 0; i < production.getValue().size() - 1; i++)
-                productions_str += production.getValue().get(i) + " | ";
-            productions_str += production.getValue().get(production.getValue().size() - 1);
+            {
+                for (int j = 0; j < production.getValue().get(i).size(); j++)
+                    productions_str += production.getValue().get(i).get(j) + " ";
+                productions_str += "| ";
+            }
+            for (int j = 0; j < production.getValue().get(production.getValue().size() - 1).size(); j++)
+                productions_str += production.getValue().get(production.getValue().size() - 1).get(j) + " ";
 
             System.out.println(production.getKey() + " -> " + productions_str);
         }
