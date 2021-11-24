@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 public class Grammar
 {
-    //this is the second time this is my line
     private Set<String> nonterminals = new HashSet<>();
     private Set<String> terminals = new HashSet<>();
     private String starting;
