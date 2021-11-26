@@ -94,4 +94,14 @@ public class Grammar
         return true;
 
     }
+
+    public List<List<String>> ruleForNonterminal(String nonterminal)
+    {
+        return rules.get(nonterminal);
+    }
+
+    public Set<String> getNonterminals()
+    {
+        return nonterminals;
+    }
 }
