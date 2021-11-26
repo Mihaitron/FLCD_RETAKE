@@ -45,5 +45,7 @@ public class Main
         grammar.printTerminals();
         System.out.println();
         grammar.printProductions();
+        System.out.println();
+        System.out.println(grammar.isCFG());
     }
 }
