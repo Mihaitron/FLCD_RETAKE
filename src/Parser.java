@@ -1,7 +1,7 @@
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 
 public class Parser {
 
@@ -12,12 +12,11 @@ public class Parser {
         G = g;
     }
 
-    public Map<List<String>, List<List<String>>> closure(List<String> nonterminals, List<List<String>> I)
+    public Entry<List<String>, List<List<String>>> closure(Entry<List<String>, List<List<String>>> I)
     {
         List<List<String>> C;
         List<List<String>> CClone;
-        C = new ArrayList<>(I);
-        Map<List<String>, List<List<String>>> rez = new HashMap<>();
+        C = new ArrayList<>(I.getValue());
 
         do {
             CClone = new ArrayList<>(C);
@@ -25,22 +24,25 @@ public class Parser {
             {
                 for (int i = 0; i < rule.size(); i++)
                 {
-                    if (rule.get(i).equals(".") && G.getNonterminals().contains(rule.get(i + 1)) && !listContainsLists(C, G.ruleForNonterminal(rule.get(i + 1)))) {
-                        List<List<String>> rules = G.ruleForNonterminal(rule.get(i + 1));
-                        C.addAll(G.ruleForNonterminal(rule.get(i + 1)));
-                        for (int j = 0; j < rules.size(); j++)
+                    String nextRule = rule.get(i + 1);
+                    List<List<String>> nextRuleNonterminals = G.ruleForNonterminal(nextRule);
+
+                    if (rule.get(i).equals(".") && G.getNonterminals().contains(nextRule) && !listContainsLists(C, nextRuleNonterminals))
+                    {
+                        C.addAll(nextRuleNonterminals);
+                        for (List<String> nextRuleNonterminal : nextRuleNonterminals)
                         {
-                            nonterminals.add(rule.get(i + 1));
-                            rules.get(j).add(0, ".");
-                            C.add(rules.get(j));
+                            I.getKey().add(nextRule);
+                            nextRuleNonterminal.add(0, ".");
+                            C.add(nextRuleNonterminal);
                         }
                     }
                 }
             }
         } while (listEquals(CClone, C));
 
-        rez.put(nonterminals, C);
-        return rez;
+        I.setValue(C);
+        return I;
     }
 
     private boolean listEquals(List<List<String>> list1, List<List<String>> list2)
