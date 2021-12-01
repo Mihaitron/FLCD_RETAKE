@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Parser {
 
@@ -10,26 +12,35 @@ public class Parser {
         G = g;
     }
 
-    public List<List<String>> closure(List<List<String>> I)
+    public Map<List<String>, List<List<String>>> closure(List<String> nonterminals, List<List<String>> I)
     {
-        List<List<String>> C = new ArrayList<>();
+        List<List<String>> C;
         List<List<String>> CClone;
         C = new ArrayList<>(I);
+        Map<List<String>, List<List<String>>> rez = new HashMap<>();
 
         do {
             CClone = new ArrayList<>(C);
             for (List<String> rule : C)
             {
-                for (String elem : rule)
+                for (int i = 0; i < rule.size(); i++)
                 {
-                    if (G.getNonterminals().contains(elem) && !listContainsLists(C, G.ruleForNonterminal(elem))) {
-                        C.addAll(G.ruleForNonterminal(elem));
+                    if (rule.get(i).equals(".") && G.getNonterminals().contains(rule.get(i + 1)) && !listContainsLists(C, G.ruleForNonterminal(rule.get(i + 1)))) {
+                        List<List<String>> rules = G.ruleForNonterminal(rule.get(i + 1));
+                        C.addAll(G.ruleForNonterminal(rule.get(i + 1)));
+                        for (int j = 0; j < rules.size(); j++)
+                        {
+                            nonterminals.add(rule.get(i + 1));
+                            rules.get(j).add(0, ".");
+                            C.add(rules.get(j));
+                        }
                     }
                 }
             }
         } while (listEquals(CClone, C));
 
-        return C;
+        rez.put(nonterminals, C);
+        return rez;
     }
 
     private boolean listEquals(List<List<String>> list1, List<List<String>> list2)
