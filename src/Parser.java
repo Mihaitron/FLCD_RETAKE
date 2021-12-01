@@ -45,6 +45,40 @@ public class Parser {
         return I;
     }
 
+    public Entry<List<String>, List<List<String>>> goTo(Entry<List<String>, List<List<String>>> s, String X)
+    {
+        Entry<List<String>, List<List<String>>> rez = new SimpleEntry<>(new ArrayList<>(), new ArrayList<>());
+
+        for (int i = 0; i < s.getValue().size(); i++)
+        {
+            List<String> rule = s.getValue().get(i);
+            List<String> newRule = new ArrayList<>();
+            boolean important = false;
+
+            for (int j = 0; j < rule.size(); j++) {
+                String nextRule = rule.get(j + 1);
+
+                if (rule.get(i).equals(".") && X.equals(nextRule)) {
+                    newRule.add(nextRule);
+                    newRule.add(".");
+                    j++;
+                } else
+                    newRule.add(rule.get(i));
+            }
+
+            if (important) {
+                rez.getValue().add(rule);
+                rez.getKey().add(s.getKey().get(i));
+                rez.getValue().add(newRule);
+                rez.getKey().add(s.getKey().get(i));
+            }
+        }
+        if (rez.getValue().size() == 0)
+            return null;
+
+        return closure(rez);
+    }
+
     private boolean listEquals(List<List<String>> list1, List<List<String>> list2)
     {
         if (list1.size() != list2.size())
