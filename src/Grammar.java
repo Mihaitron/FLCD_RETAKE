@@ -104,4 +104,6 @@ public class Grammar
     {
         return nonterminals;
     }
+
+    public Set<String> getTerminals() { return terminals; }
 }

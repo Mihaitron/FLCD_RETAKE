@@ -79,6 +79,48 @@ public class Parser {
         return closure(rez);
     }
 
+    public List<Entry<List<String>, List<List<String>>>> canCol()
+    {
+        List<Entry<List<String>, List<List<String>>>> rez = new ArrayList<>();
+        List<String> nt = new ArrayList<>();
+        nt.add("S1");
+        List<List<String>>rightSide = new ArrayList<>();
+        List<String> rule = new ArrayList<>();
+        rule.add(".");
+        rule.add("S");
+        Entry<List<String>, List<List<String>>> s0 = new SimpleEntry<>(nt, rightSide);
+
+        rez.add(closure(s0));
+        boolean stop = false;
+        while(!stop)
+        {
+            int addedStates = 0;
+            for (Entry<List<String>, List<List<String>>> sk : rez)
+            {
+                for (String terminal : G.getTerminals()) {
+                    Entry<List<String>, List<List<String>>> sNew = goTo(sk, terminal);
+                    if (sNew != null && !rez.contains(sNew))
+                    {
+                        rez.add(sNew);
+                        addedStates++;
+                    }
+                }
+                for (String nonterminal : G.getNonterminals()) {
+                    Entry<List<String>, List<List<String>>> sNew = goTo(sk, nonterminal);
+                    if (sNew != null && !rez.contains(sNew))
+                    {
+                        rez.add(sNew);
+                        addedStates++;
+                    }
+                }
+            }
+            if (addedStates == 0)
+                stop = true;
+        }
+
+        return rez;
+    }
+
     private boolean listEquals(List<List<String>> list1, List<List<String>> list2)
     {
         if (list1.size() != list2.size())
