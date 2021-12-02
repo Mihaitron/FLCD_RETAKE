@@ -27,23 +27,25 @@ public class Parser {
                     String nextRule = rule.get(i + 1);
                     List<List<String>> nextRuleNonterminals = G.ruleForNonterminal(nextRule);
 
-                    List<List<String>> ruleInObject = new ArrayList<>();
+                    List<List<String>> dotNextRuleNonterminal = new ArrayList<>();
                     if (nextRuleNonterminals != null)
                     {
                         for (List<String> nextRuleNonterminal : nextRuleNonterminals) {
                             List<String> nextRuleNonterminalCopy = new ArrayList<>(nextRuleNonterminal);
                             nextRuleNonterminalCopy.add(0, ".");
-                            ruleInObject.add(nextRuleNonterminalCopy);
+                            dotNextRuleNonterminal.add(nextRuleNonterminalCopy);
                         }
                     }
 
-                    if (rule.get(i).equals(".") && G.getNonterminals().contains(nextRule) && !listContainsLists(C, ruleInObject))
+                    if (rule.get(i).equals(".") && G.getNonterminals().contains(nextRule))
                     {
-                        //C.addAll(nextRuleNonterminals);
-                        for (List<String> ruleInObj : ruleInObject)
+                        for (List<String> dotRule : dotNextRuleNonterminal)
                         {
-                            I.getKey().add(nextRule);
-                            C.add(ruleInObj);
+                            if (!listListContainsList(C, dotRule))
+                            {
+                                I.getKey().add(nextRule);
+                                C.add(dotRule);
+                            }
                         }
                     }
                 }
@@ -165,20 +167,11 @@ public class Parser {
         return true;
     }
 
-    private boolean listContainsLists(List<List<String>> C, List<List<String>> lists)
+    private boolean listListContainsList(List<List<String>> C, List<String> list)
     {
-        boolean ok;
-        for (List<String> list : lists)
-        {
-            ok = false;
-            for (List<String> list2 : C)
-            {
-                if (listEquals(list, list2))
-                    ok = true;
-            }
-            if (!ok)
-                return false;
-        }
-        return true;
+        for (List<String> item : C)
+            if (listEquals(item, list))
+                return true;
+        return false;
     }
 }
