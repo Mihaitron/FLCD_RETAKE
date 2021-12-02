@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class Main
 {
@@ -40,12 +42,14 @@ public class Main
         Grammar grammar = new Grammar();
         grammar.readGrammar("g1.in");
 
-        grammar.printNonterminals();
-        System.out.println();
-        grammar.printTerminals();
-        System.out.println();
-        grammar.printProductions();
-        System.out.println();
-        System.out.println(grammar.isCFG());
+//        grammar.printNonterminals();
+//        System.out.println();
+//        grammar.printTerminals();
+//        System.out.println();
+//        grammar.printProductions();
+//        System.out.println();
+//        System.out.println(grammar.isCFG());
+        Parser parser = new Parser(grammar);
+        List<Map.Entry<List<String>, List<List<String>>>> parse = parser.canCol();
     }
 }
