@@ -1,8 +1,5 @@
-S A B C D
-a b
+S A
+a b c d
 S
-S -> a A | a C
-A -> A B
-B -> b
-C -> a C | C D
-D -> b
+S -> a S | b S c | d A
+A -> d c

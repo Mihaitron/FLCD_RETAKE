@@ -20,21 +20,22 @@ public class Parser {
 
         do {
             CClone = new ArrayList<>(C);
-            for (List<String> rule : C)
+            for (List<String> rule : CClone)
             {
-                for (int i = 0; i < rule.size(); i++)
+                for (int i = 0; i < rule.size() - 1; i++)
                 {
                     String nextRule = rule.get(i + 1);
                     List<List<String>> nextRuleNonterminals = G.ruleForNonterminal(nextRule);
 
                     if (rule.get(i).equals(".") && G.getNonterminals().contains(nextRule) && !listContainsLists(C, nextRuleNonterminals))
                     {
-                        C.addAll(nextRuleNonterminals);
+                        //C.addAll(nextRuleNonterminals);
                         for (List<String> nextRuleNonterminal : nextRuleNonterminals)
                         {
                             I.getKey().add(nextRule);
-                            nextRuleNonterminal.add(0, ".");
-                            C.add(nextRuleNonterminal);
+                            List<String> nextRuleNonterminalCopy = new ArrayList<>(nextRuleNonterminal);
+                            nextRuleNonterminalCopy.add(0, ".");
+                            C.add(nextRuleNonterminalCopy);
                         }
                     }
                 }
@@ -55,15 +56,18 @@ public class Parser {
             List<String> newRule = new ArrayList<>();
             boolean important = false;
 
-            for (int j = 0; j < rule.size(); j++) {
+            for (int j = 0; j < rule.size() - 1; j++) {
                 String nextRule = rule.get(j + 1);
 
-                if (rule.get(i).equals(".") && X.equals(nextRule)) {
+                if (rule.get(j).equals(".") && X.equals(nextRule)) {
                     newRule.add(nextRule);
                     newRule.add(".");
-                    j++;
+                    if (j + 2 < rule.size())
+                        newRule.addAll(rule.subList(j + 2, rule.size()));
+                    important = true;
+                    break;
                 } else
-                    newRule.add(rule.get(i));
+                    newRule.add(rule.get(j));
             }
 
             if (important) {
@@ -88,14 +92,17 @@ public class Parser {
         List<String> rule = new ArrayList<>();
         rule.add(".");
         rule.add("S");
+        rightSide.add(rule);
         Entry<List<String>, List<List<String>>> s0 = new SimpleEntry<>(nt, rightSide);
+        List<Entry<List<String>, List<List<String>>>> rezCopy;
 
         rez.add(closure(s0));
         boolean stop = false;
         while(!stop)
         {
             int addedStates = 0;
-            for (Entry<List<String>, List<List<String>>> sk : rez)
+            rezCopy = new ArrayList<>(rez);
+            for (Entry<List<String>, List<List<String>>> sk : rezCopy)
             {
                 for (String terminal : G.getTerminals()) {
                     Entry<List<String>, List<List<String>>> sNew = goTo(sk, terminal);
