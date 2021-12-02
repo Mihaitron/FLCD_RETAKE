@@ -39,7 +39,7 @@ public class Parser {
                     }
                 }
             }
-        } while (listEquals(CClone, C));
+        } while (listListEquals(CClone, C));
 
         I.setValue(C);
         return I;
@@ -99,7 +99,7 @@ public class Parser {
             {
                 for (String terminal : G.getTerminals()) {
                     Entry<List<String>, List<List<String>>> sNew = goTo(sk, terminal);
-                    if (sNew != null && !rez.contains(sNew))
+                    if (sNew != null && !listContainsValue(rez, sNew))
                     {
                         rez.add(sNew);
                         addedStates++;
@@ -107,7 +107,7 @@ public class Parser {
                 }
                 for (String nonterminal : G.getNonterminals()) {
                     Entry<List<String>, List<List<String>>> sNew = goTo(sk, nonterminal);
-                    if (sNew != null && !rez.contains(sNew))
+                    if (sNew != null && !listContainsValue(rez, sNew))
                     {
                         rez.add(sNew);
                         addedStates++;
@@ -121,14 +121,32 @@ public class Parser {
         return rez;
     }
 
-    private boolean listEquals(List<List<String>> list1, List<List<String>> list2)
+    private boolean listContainsValue(List<Entry<List<String>, List<List<String>>>> list, Entry<List<String>, List<List<String>>> value)
+    {
+        for (Entry<List<String>, List<List<String>>> item : list)
+            if (listEquals(item.getKey(), value.getKey()) && listListEquals(item.getValue(), value.getValue()))
+                return true;
+        return false;
+    }
+
+    private boolean listEquals(List<String> list1, List<String> list2)
     {
         if (list1.size() != list2.size())
             return false;
-        for (List<String> l : list1) {
-            if (!list2.contains(list1))
+
+        for (String item : list1)
+            if (!list2.contains(item))
                 return false;
-        }
+        return true;
+    }
+
+    private boolean listListEquals(List<List<String>> list1, List<List<String>> list2)
+    {
+        if (list1.size() != list2.size())
+            return false;
+        for (int i = 0; i < list1.size(); i++)
+            if (!listEquals(list1.get(i), list2.get(i)))
+                return false;
         return true;
     }
 
