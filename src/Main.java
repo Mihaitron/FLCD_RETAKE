@@ -21,34 +21,14 @@ public class Main
     {
 //        Scanner scanner = new Scanner();
 //        scanner.scan("p1err.orange");
-//
+
 //        FA fa = new FA();
 //        fa.readFA("test.in");
 //
-//        java.util.Scanner keyboard = new java.util.Scanner(System.in);
-//
-//        printMenu();
-//
-//        String input = keyboard.next();
-//        while (!input.equals("0"))
-//        {
-//            fa.printFA(input);
-//
-//            printMenu();
-//
-//            input = keyboard.next();
-//        }
 
         Grammar grammar = new Grammar();
         grammar.readGrammar("g1.in");
 
-//        grammar.printNonterminals();
-//        System.out.println();
-//        grammar.printTerminals();
-//        System.out.println();
-//        grammar.printProductions();
-//        System.out.println();
-//        System.out.println(grammar.isCFG());
         Parser parser = new Parser(grammar);
         List<Map.Entry<List<String>, List<List<String>>>> parse = parser.canCol();
     }

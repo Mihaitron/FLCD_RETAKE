@@ -81,8 +81,6 @@ public class Parser {
             }
 
             if (important) {
-                rez.getValue().add(rule);
-                rez.getKey().add(s.getKey().get(i));
                 rez.getValue().add(newRule);
                 rez.getKey().add(s.getKey().get(i));
             }
