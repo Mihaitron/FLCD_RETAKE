@@ -1,11 +1,14 @@
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class Parser {
 
     private Grammar G;
+    private List<String> action;
+    private List<Map<String, Entry<List<String>, List<List<String>>>>> gotoColumn;
 
     public Parser(Grammar g)
     {
