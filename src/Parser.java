@@ -1,5 +1,6 @@
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -7,6 +8,9 @@ import java.util.Map.Entry;
 public class Parser {
 
     private Grammar G;
+    private Map<String, Entry<List<String>, List<List<String>>>> statesMap;
+    int stateNumber;
+    Map<String, Map<String, String>> parsingTable;
     private List<String> action;
     private List<Map<String, Entry<List<String>, List<List<String>>>>> gotoColumn;
 
@@ -106,28 +110,52 @@ public class Parser {
         rightSide.add(rule);
         Entry<List<String>, List<List<String>>> s0 = new SimpleEntry<>(nt, rightSide);
         List<Entry<List<String>, List<List<String>>>> rezCopy;
+        parsingTable = new HashMap<>();
+        statesMap = new HashMap<>();
+        stateNumber = 0;
 
         rez.add(closure(s0));
+
+        statesMap.put("s0", rez.get(0));
+        stateNumber++;
+        parsingTable.put("s0", parsingTableRow(rez.get(0)));
+
         boolean stop = false;
         while(!stop)
         {
             int addedStates = 0;
             rezCopy = new ArrayList<>(rez);
-            for (Entry<List<String>, List<List<String>>> sk : rezCopy)
+            for (int i = 0; i < rezCopy.size(); i++)
             {
                 for (String terminal : G.getTerminals()) {
-                    Entry<List<String>, List<List<String>>> sNew = goTo(sk, terminal);
+                    Entry<List<String>, List<List<String>>> sNew = goTo(rezCopy.get(i), terminal);
                     if (sNew != null && !listContainsValue(rez, sNew))
                     {
                         rez.add(sNew);
+
+                        Map<String, String> tableRow = parsingTable.get("s" + i);
+                        statesMap.put("s" + stateNumber, sNew);
+                        tableRow.put(terminal, "s" + stateNumber);
+                        parsingTable.replace("s" + i, tableRow);
+                        stateNumber++;
+                        parsingTable.put("s" + stateNumber, parsingTableRow(sNew));
+
                         addedStates++;
                     }
                 }
                 for (String nonterminal : G.getNonterminals()) {
-                    Entry<List<String>, List<List<String>>> sNew = goTo(sk, nonterminal);
+                    Entry<List<String>, List<List<String>>> sNew = goTo(rezCopy.get(i), nonterminal);
                     if (sNew != null && !listContainsValue(rez, sNew))
                     {
                         rez.add(sNew);
+
+                        Map<String, String> tableRow = parsingTable.get("s" + i);
+                        statesMap.put("s" + stateNumber, sNew);
+                        tableRow.put(nonterminal, "s" + stateNumber);
+                        parsingTable.replace("s" + i, tableRow);
+                        stateNumber++;
+                        parsingTable.put("s" + stateNumber, parsingTableRow(sNew));
+
                         addedStates++;
                     }
                 }
@@ -174,5 +202,26 @@ public class Parser {
             if (listEquals(item, list))
                 return true;
         return false;
+    }
+
+    public Map<String, String> parsingTableRow(Entry<List<String>, List<List<String>>> state)
+    {
+        Map<String, String> rez = new HashMap<>();
+        List<List<String>> rules = state.getValue();
+        for (int i = 0; i < rules.size(); i++)
+        {
+            if (rules.get(i).get(rules.get(i).size() - 1).equals("."))
+            {
+                if (rules.get(i).size() == 2 && rules.get(i).get(0).equals("S"))
+                    rez.put("action", "acc");
+                else
+                    rez.put("action", "reduce" + G.getProductionNumber(state.getKey().get(i), rules.get(i)));
+            }
+            else
+            {
+                rez.put("action", "shift");
+            }
+        }
+        return rez;
     }
 }

@@ -106,4 +106,30 @@ public class Grammar
     }
 
     public Set<String> getTerminals() { return terminals; }
+
+    public int getProductionNumber(String nonterminal, List<String> rule)
+    {
+        int prodNb = 1;
+        for (Entry<String, List<List<String>>> prod : rules.entrySet())
+        {
+            for (List<String> list : prod.getValue())
+            {
+                if (listEquals(list, rule) && prod.getKey().equals(nonterminal))
+                    return prodNb;
+                prodNb++;
+            }
+        }
+        return prodNb;
+    }
+
+    private boolean listEquals(List<String> list1, List<String> list2)
+    {
+        if (list1.size() != list2.size())
+            return false;
+
+        for (String item : list1)
+            if (!list2.contains(item))
+                return false;
+        return true;
+    }
 }
