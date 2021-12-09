@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class Parser {
 
@@ -118,7 +119,7 @@ public class Parser {
 
         statesMap.put("s0", rez.get(0));
         stateNumber++;
-        parsingTable.put("s0", parsingTableRow(rez.get(0)));
+        parsingTable.put("s0", parsingTableRow(rez.get(0), "s0"));
 
         boolean stop = false;
         while(!stop)
@@ -138,7 +139,7 @@ public class Parser {
                         tableRow.put(terminal, "s" + stateNumber);
                         parsingTable.replace("s" + i, tableRow);
                         stateNumber++;
-                        parsingTable.put("s" + stateNumber, parsingTableRow(sNew));
+                        parsingTable.put("s" + stateNumber, parsingTableRow(sNew, "s" + stateNumber));
 
                         addedStates++;
                     }
@@ -154,7 +155,7 @@ public class Parser {
                         tableRow.put(nonterminal, "s" + stateNumber);
                         parsingTable.replace("s" + i, tableRow);
                         stateNumber++;
-                        parsingTable.put("s" + stateNumber, parsingTableRow(sNew));
+                        parsingTable.put("s" + stateNumber, parsingTableRow(sNew, "s" + stateNumber));
 
                         addedStates++;
                     }
@@ -204,10 +205,13 @@ public class Parser {
         return false;
     }
 
-    public Map<String, String> parsingTableRow(Entry<List<String>, List<List<String>>> state)
+    public Map<String, String> parsingTableRow(Entry<List<String>, List<List<String>>> state, String stateString)
     {
         Map<String, String> rez = new HashMap<>();
         List<List<String>> rules = state.getValue();
+        boolean acc;
+        boolean reduce;
+        boolean shift;
         for (int i = 0; i < rules.size(); i++)
         {
             if (rules.get(i).get(rules.get(i).size() - 1).equals("."))
@@ -215,11 +219,24 @@ public class Parser {
                 if (rules.get(i).size() == 2 && rules.get(i).get(0).equals("S"))
                     rez.put("action", "acc");
                 else
-                    rez.put("action", "reduce" + G.getProductionNumber(state.getKey().get(i), rules.get(i)));
+                    rez.put("action", "reduce " + G.getProductionNumber(state.getKey().get(i), rules.get(i)));
             }
             else
             {
                 rez.put("action", "shift");
+            }
+        }
+        if (rez.size() > 1)
+        {
+            String type = new ArrayList<>(rez.values()).get(0).split(" ")[0];
+            for (String val : rez.values())
+            {
+                if (!type.equals(val.split(" ")[0]) || (type.contains("reduce") && !val.split(" ")[0].equals(type.split(" ")[0])))
+                {
+                    System.out.println("Conflict at row " + stateString + " column action!");
+                    rez = new HashMap<>();
+                    rez.put("action", "conflict");
+                }
             }
         }
         return rez;
