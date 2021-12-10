@@ -172,26 +172,32 @@ public class Parser {
             if (rules.get(i).get(rules.get(i).size() - 1).equals("."))
             {
                 if (rules.get(i).size() == 2 && rules.get(i).get(0).equals("S"))
-                    rez.put("action", "acc");
-                else
-                    rez.put("action", "reduce " + G.getProductionNumber(state.getKey().get(i), rules.get(i).subList(0, rules.get(i).size() - 1)));
+                {
+                    if (rez.size() != 0 && !rez.get("action").equals("acc"))
+                    {
+                        System.out.println("Conflict at row - " + stateString + " column - action!");
+                        rez.put("action", "conflict");
+                    }
+                    else
+                        rez.put("action", "acc");
+                }
+                else {
+                    if (rez.size() != 0 && !rez.get("action").equals("reduce" + G.getProductionNumber(state.getKey().get(i), rules.get(i).subList(0, rules.get(i).size() - 1)))) {
+                        System.out.println("Conflict at row - " + stateString + " column - action!");
+                        rez.put("action", "conflict");
+                    } else
+                        rez.put("action", "reduce " + G.getProductionNumber(state.getKey().get(i), rules.get(i).subList(0, rules.get(i).size() - 1)));
+                }
             }
             else
             {
-                rez.put("action", "shift");
-            }
-        }
-        if (rez.size() > 1)
-        {
-            String type = new ArrayList<>(rez.values()).get(0).split(" ")[0];
-            for (String val : rez.values())
-            {
-                if (!type.equals(val.split(" ")[0]) || (type.contains("reduce") && !val.split(" ")[0].equals(type.split(" ")[0])))
+                if (rez.size() != 0 && !rez.get("action").equals("shift"))
                 {
                     System.out.println("Conflict at row - " + stateString + " column - action!");
-                    rez = new HashMap<>();
                     rez.put("action", "conflict");
                 }
+                else
+                    rez.put("action", "shift");
             }
         }
         return rez;
@@ -241,6 +247,14 @@ public class Parser {
 
     public void parse(String w)
     {
+        for (Entry<String, Map<String, String>> row : parsingTable.entrySet())
+        {
+            for (Entry<String, String> val : row.getValue().entrySet())
+            {
+                if (val.getValue().equals("conflict"))
+                    return;
+            }
+        }
         String state = "s0";
 
         Stack<String> alpha = new Stack<>();
@@ -276,8 +290,13 @@ public class Parser {
             }
             else if (action.equals("acc"))
             {
-                System.out.println("success");
-                System.out.println(phi);
+                if (beta.size() > 1)
+                    System.out.println("error");
+                else
+                {
+                    System.out.println("success");
+                    System.out.println(phi);
+                }
                 end = true;
             }
             state = alpha.peek();
