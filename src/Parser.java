@@ -1,8 +1,5 @@
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -233,12 +230,49 @@ public class Parser {
             {
                 if (!type.equals(val.split(" ")[0]) || (type.contains("reduce") && !val.split(" ")[0].equals(type.split(" ")[0])))
                 {
-                    System.out.println("Conflict at row " + stateString + " column action!");
+                    System.out.println("Conflict at row - " + stateString + " column - action!");
                     rez = new HashMap<>();
                     rez.put("action", "conflict");
                 }
             }
         }
         return rez;
+    }
+
+    public void parsing(String w)
+    {
+        String state = "s0";
+        Stack<String> alpha = new Stack<>();
+        alpha.push(state);
+        alpha.push("$");
+        Stack<String> beta = new Stack<>();
+        beta.push("$");
+        for (String str : w.split(" "))
+        {
+            beta.push(w);
+        }
+        String phi = "";
+        boolean end = false;
+        do {
+            if (parsingTable.get(state).get("action").equals("shift"))
+            {
+
+            }
+            else if (parsingTable.get(state).get("action").contains("reduce"))
+            {
+
+            }
+            else if (parsingTable.get(state).get("action").equals("acc"))
+            {
+                System.out.println("success");
+                System.out.println(phi);
+                end = true;
+            }
+            else
+            {
+                System.out.println("error");
+                end = true;
+            }
+        } while (!end);
     }
 }
