@@ -30,6 +30,7 @@ public class Main
         grammar.readGrammar("g1.in");
 
         Parser parser = new Parser(grammar);
-        List<Map.Entry<List<String>, List<List<String>>>> parse = parser.canCol();
+        List<Map.Entry<List<String>, List<List<String>>>> canCol = parser.canCol();
+        parser.parse("a b b d d c c c");
     }
 }

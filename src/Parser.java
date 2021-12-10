@@ -43,7 +43,7 @@ public class Parser {
                     {
                         for (List<String> dotRule : dotNextRuleNonterminal)
                         {
-                            if (!listListContainsList(C, dotRule))
+                            if (!Utils.listListContainsList(C, dotRule))
                             {
                                 I.getKey().add(nextRule);
                                 C.add(dotRule);
@@ -52,7 +52,7 @@ public class Parser {
                     }
                 }
             }
-        } while (!listListEquals(CClone, C));
+        } while (!Utils.listListEquals(CClone, C));
 
         I.setValue(C);
         return I;
@@ -90,7 +90,8 @@ public class Parser {
         if (rez.getValue().size() == 0)
             return null;
 
-        return closure(rez);
+        Entry<List<String>, List<List<String>>> closureRez = closure(rez);
+        return closureRez;
     }
 
     public List<Entry<List<String>, List<List<String>>>> canCol()
@@ -124,7 +125,7 @@ public class Parser {
             {
                 for (String terminal : G.getTerminals()) {
                     Entry<List<String>, List<List<String>>> sNew = goTo(rezCopy.get(i), terminal);
-                    if (sNew != null && !listContainsValue(rez, sNew))
+                    if (sNew != null && !Utils.listContainsValue(rez, sNew))
                     {
                         rez.add(sNew);
 
@@ -140,7 +141,7 @@ public class Parser {
                 }
                 for (String nonterminal : G.getNonterminals()) {
                     Entry<List<String>, List<List<String>>> sNew = goTo(rezCopy.get(i), nonterminal);
-                    if (sNew != null && !listContainsValue(rez, sNew))
+                    if (sNew != null && !Utils.listContainsValue(rez, sNew))
                     {
                         rez.add(sNew);
 
@@ -160,43 +161,6 @@ public class Parser {
         }
 
         return rez;
-    }
-
-    private boolean listContainsValue(List<Entry<List<String>, List<List<String>>>> list, Entry<List<String>, List<List<String>>> value)
-    {
-        for (Entry<List<String>, List<List<String>>> item : list)
-            if (listEquals(item.getKey(), value.getKey()) && listListEquals(item.getValue(), value.getValue()))
-                return true;
-        return false;
-    }
-
-    private boolean listEquals(List<String> list1, List<String> list2)
-    {
-        if (list1.size() != list2.size())
-            return false;
-
-        for (String item : list1)
-            if (!list2.contains(item))
-                return false;
-        return true;
-    }
-
-    private boolean listListEquals(List<List<String>> list1, List<List<String>> list2)
-    {
-        if (list1.size() != list2.size())
-            return false;
-        for (int i = 0; i < list1.size(); i++)
-            if (!listEquals(list1.get(i), list2.get(i)))
-                return false;
-        return true;
-    }
-
-    private boolean listListContainsList(List<List<String>> C, List<String> list)
-    {
-        for (List<String> item : C)
-            if (listEquals(item, list))
-                return true;
-        return false;
     }
 
     private Map<String, String> parsingTableRow(Entry<List<String>, List<List<String>>> state, String stateString)
@@ -233,30 +197,79 @@ public class Parser {
         return rez;
     }
 
-    public void parsing(String w)
+    private void actionShift(Stack<String> alpha, Stack<String> beta, Stack<String> phi)
+    {
+        Entry<List<String>, List<List<String>>> newStateObj = goTo(statesMap.get(alpha.peek()), beta.peek());
+        for (Entry<String, Entry<List<String>, List<List<String>>>> stateEntry : statesMap.entrySet())
+        {
+            String stateNumber = stateEntry.getKey();
+            Entry<List<String>, List<List<String>>> stateObject = stateEntry.getValue();
+
+            if (Utils.stateEqualsState(newStateObj, stateObject))
+            {
+                alpha.push(beta.pop());
+                alpha.push(stateNumber);
+                break;
+            }
+        }
+    }
+
+    private void actionReduce(Stack<String> alpha, Stack<String> beta, Stack<String> phi, String reduceNumber)
+    {
+        Entry<String, List<String>> production = G.getProductionByNumber(Integer.valueOf(reduceNumber));
+        for (int i = 0; i < production.getValue().size(); i++)
+        {
+            alpha.pop();
+            alpha.pop();
+        }
+
+        Entry<List<String>, List<List<String>>> newStateObj = goTo(statesMap.get(alpha.peek()), production.getKey());
+        for (Entry<String, Entry<List<String>, List<List<String>>>> stateEntry : statesMap.entrySet())
+        {
+            String stateNumber = stateEntry.getKey();
+            Entry<List<String>, List<List<String>>> stateObject = stateEntry.getValue();
+
+            if (Utils.stateEqualsState(newStateObj, stateObject))
+            {
+                alpha.push(production.getKey());
+                alpha.push(stateNumber);
+                phi.push(reduceNumber);
+                break;
+            }
+        }
+    }
+
+    public void parse(String w)
     {
         String state = "s0";
+
         Stack<String> alpha = new Stack<>();
-        alpha.push(state);
         alpha.push("$");
+        alpha.push(state);
+
         Stack<String> beta = new Stack<>();
         beta.push("$");
-        for (String str : w.split(" "))
-        {
-            beta.push(w);
-        }
-        String phi = "";
+        StringBuilder builder = new StringBuilder();
+        builder.append(w);
+        builder.reverse();
+        for (String str : builder.toString().split(" "))
+            beta.push(str);
+
+        Stack<String> phi = new Stack<>();
+
         boolean end = false;
+
+        String action = parsingTable.get(state).get("action");
         do {
-            if (parsingTable.get(state).get("action").equals("shift"))
+            if (action.equals("shift"))
             {
-
+                actionShift(alpha, beta, phi);
             }
-            else if (parsingTable.get(state).get("action").contains("reduce"))
+            else if (action.contains("reduce"))
             {
-
+                actionReduce(alpha, beta, phi, action.split(" ")[1]);
             }
-            else if (parsingTable.get(state).get("action").equals("acc"))
+            else if (action.equals("acc"))
             {
                 System.out.println("success");
                 System.out.println(phi);
@@ -267,6 +280,8 @@ public class Parser {
                 System.out.println("error");
                 end = true;
             }
+            state = alpha.peek();
+            action = parsingTable.get(state).get("action");
         } while (!end);
     }
 }

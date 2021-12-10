@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.Map.Entry;
+import java.util.AbstractMap.SimpleEntry;
 
 public class Grammar
 {
@@ -114,7 +115,7 @@ public class Grammar
         {
             for (List<String> list : prod.getValue())
             {
-                if (listEquals(list, rule) && prod.getKey().equals(nonterminal))
+                if (Utils.listEquals(list, rule) && prod.getKey().equals(nonterminal))
                     return prodNb;
                 prodNb++;
             }
@@ -122,14 +123,18 @@ public class Grammar
         return prodNb;
     }
 
-    private boolean listEquals(List<String> list1, List<String> list2)
+    public Entry<String, List<String>> getProductionByNumber(Integer productionNumber)
     {
-        if (list1.size() != list2.size())
-            return false;
-
-        for (String item : list1)
-            if (!list2.contains(item))
-                return false;
-        return true;
+        int prodNb = 1;
+        for (Entry<String, List<List<String>>> prod : rules.entrySet())
+        {
+            for (List<String> list : prod.getValue())
+            {
+                if (productionNumber == prodNb)
+                    return new SimpleEntry<>(prod.getKey(), list);
+                prodNb++;
+            }
+        }
+        return null;
     }
 }
