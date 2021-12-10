@@ -1,7 +1,6 @@
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 public class Parser {
 
@@ -9,8 +8,6 @@ public class Parser {
     private Map<String, Entry<List<String>, List<List<String>>>> statesMap;
     int stateNumber;
     Map<String, Map<String, String>> parsingTable;
-    private List<String> action;
-    private List<Map<String, Entry<List<String>, List<List<String>>>>> gotoColumn;
 
     public Parser(Grammar g)
     {
@@ -135,8 +132,8 @@ public class Parser {
                         statesMap.put("s" + stateNumber, sNew);
                         tableRow.put(terminal, "s" + stateNumber);
                         parsingTable.replace("s" + i, tableRow);
-                        stateNumber++;
                         parsingTable.put("s" + stateNumber, parsingTableRow(sNew, "s" + stateNumber));
+                        stateNumber++;
 
                         addedStates++;
                     }
@@ -151,8 +148,8 @@ public class Parser {
                         statesMap.put("s" + stateNumber, sNew);
                         tableRow.put(nonterminal, "s" + stateNumber);
                         parsingTable.replace("s" + i, tableRow);
-                        stateNumber++;
                         parsingTable.put("s" + stateNumber, parsingTableRow(sNew, "s" + stateNumber));
+                        stateNumber++;
 
                         addedStates++;
                     }
@@ -202,13 +199,10 @@ public class Parser {
         return false;
     }
 
-    public Map<String, String> parsingTableRow(Entry<List<String>, List<List<String>>> state, String stateString)
+    private Map<String, String> parsingTableRow(Entry<List<String>, List<List<String>>> state, String stateString)
     {
         Map<String, String> rez = new HashMap<>();
         List<List<String>> rules = state.getValue();
-        boolean acc;
-        boolean reduce;
-        boolean shift;
         for (int i = 0; i < rules.size(); i++)
         {
             if (rules.get(i).get(rules.get(i).size() - 1).equals("."))
@@ -216,7 +210,7 @@ public class Parser {
                 if (rules.get(i).size() == 2 && rules.get(i).get(0).equals("S"))
                     rez.put("action", "acc");
                 else
-                    rez.put("action", "reduce " + G.getProductionNumber(state.getKey().get(i), rules.get(i)));
+                    rez.put("action", "reduce " + G.getProductionNumber(state.getKey().get(i), rules.get(i).subList(0, rules.get(i).size() - 1)));
             }
             else
             {
