@@ -261,7 +261,12 @@ public class Parser {
 
         String action = parsingTable.get(state).get("action");
         do {
-            if (action.equals("shift"))
+            if (action.equals("shift") && beta.size() == 1)
+            {
+                System.out.println("error");
+                end = true;
+            }
+            else if (action.equals("shift"))
             {
                 actionShift(alpha, beta, phi);
             }
@@ -273,11 +278,6 @@ public class Parser {
             {
                 System.out.println("success");
                 System.out.println(phi);
-                end = true;
-            }
-            else
-            {
-                System.out.println("error");
                 end = true;
             }
             state = alpha.peek();
